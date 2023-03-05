@@ -4,11 +4,11 @@ import { NextPage } from 'next'
 import LoginRequired from '@/components/atoms/LoginRequired'
 import DefaultLayout from '@/components/templates/DefaultLayout'
 
-const TopPage: NextPage = () => {
+const SearchStaffPage: NextPage = () => {
   return (
     <LoginRequired>
       <DefaultLayout>
-        <Card title='Hello'>
+        <Card title='Staff'>
           <p>Card content</p>
           <p>Card content</p>
           <p>Card content</p>
@@ -18,4 +18,4 @@ const TopPage: NextPage = () => {
   )
 }
 
-export default TopPage
+export default SearchStaffPage
