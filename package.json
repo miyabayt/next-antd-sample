@@ -29,7 +29,7 @@
     "@types/react-dom": "18.0.11",
     "@vanilla-extract/css": "^1.10.0",
     "antd": "^5.2.3",
-    "next": "13.2.3",
+    "next": "13.2.4",
     "nprogress": "^0.2.0",
     "path-to-regexp": "^6.2.1",
     "polished": "^4.2.2",
