@@ -3,12 +3,24 @@ import { AxiosRequestConfig } from 'axios'
 import useApiResource from '@/hooks/useApiResource'
 import fetcher from '@/utils/fetcher'
 
-const useStaffResource = () => {
-  return useApiResource(['holidays'], async (config?: AxiosRequestConfig) => {
-    return fetcher('/api/system/holidays', { ...config, method: 'GET' }).then(
-      ({ data }) => data,
-    )
-  })
+interface SearchHolidayParams {
+  holidayName?: string
+  page?: number
+  perpage?: number
 }
 
-export default useStaffResource
+const useHolidayResource = (params?: SearchHolidayParams) => {
+  const query = { ...params }
+  return useApiResource(
+    ['holidays', query],
+    async (config?: AxiosRequestConfig) => {
+      return fetcher('/api/system/holidays/search', {
+        ...config,
+        method: 'POST',
+        data: query,
+      }).then(({ data }) => data)
+    },
+  )
+}
+
+export default useHolidayResource

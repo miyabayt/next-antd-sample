@@ -6,7 +6,7 @@ interface SearchFormProps {
   name: string
   children: React.ReactNode
   expandable?: boolean // 詳細検索のトグル
-  onFinish?: (values: any) => void
+  onFinish?: (values: FormData) => void
   onExpandChange?: (expanded: boolean) => void
 }
 
@@ -22,12 +22,12 @@ const SearchForm = ({
   const [expand, setExpand] = useState(false)
 
   const formStyle = {
-    padding: 16,
+    padding: '16px 0',
   }
 
   return (
     <Form
-      layout='vertical'
+      layout='horizontal'
       form={form}
       name={name}
       style={formStyle}
