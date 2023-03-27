@@ -5,8 +5,8 @@ import fetcher from '@/utils/fetcher'
 
 interface SearchStaffParams {
   fullName?: string
-  page?: number
-  perpage?: number
+  current?: number
+  pageSize?: number
 }
 
 const useStaffResource = (params?: SearchStaffParams) => {
@@ -14,11 +14,16 @@ const useStaffResource = (params?: SearchStaffParams) => {
   return useApiResource(
     ['staffs', query],
     async (config?: AxiosRequestConfig) => {
-      return fetcher('/api/system/staffs/search', {
-        ...config,
-        method: 'POST',
-        data: query,
-      }).then(({ data }) => data)
+      const page = (query.current || 1) - 1
+      const pageSize = query.pageSize || 20
+      return fetcher(
+        `/api/system/staffs/search?page=${page}&size=${pageSize}`,
+        {
+          ...config,
+          method: 'POST',
+          data: query,
+        },
+      ).then(({ data }) => data)
     },
   )
 }

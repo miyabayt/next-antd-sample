@@ -28,6 +28,11 @@ const refresh = async (
       setRefreshToken(refreshToken)
       return data
     })
+    .catch((e) => {
+      setAccessToken(null)
+      setRefreshToken(null)
+      return Promise.reject(e)
+    })
 }
 
 export default refresh

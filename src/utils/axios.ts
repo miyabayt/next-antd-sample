@@ -20,13 +20,14 @@ const createAxiosInstance = () => {
     let newAccessToken = accessToken
     if (accessToken && refreshToken && isTokenExpired(accessToken)) {
       try {
-        console.info('try to refresh token...')
-        const { data } = await refresh(accessToken, refreshToken)
-        if (data.accessToken) {
+        console.log('try to refresh token...')
+        const { data, success } = await refresh(accessToken, refreshToken)
+        if (success) {
+          console.log('access token has been refreshed!')
           newAccessToken = data.accessToken
         }
       } catch (e) {
-        console.info('failed to refresh token.')
+        console.log('failed to refresh token.')
       }
     }
 

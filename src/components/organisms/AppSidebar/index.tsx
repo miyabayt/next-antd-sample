@@ -46,7 +46,7 @@ const AppSidebar = () => {
       trigger={null}
       collapsible
       collapsed={collapsed}
-      width={260}
+      width={250}
       collapsedWidth={50}
       css={styles.sider}
       theme='light'

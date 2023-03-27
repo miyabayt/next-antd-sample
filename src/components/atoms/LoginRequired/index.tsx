@@ -18,7 +18,7 @@ const LoginRequired = ({ children }: LoginRequiredProps) => {
   useEffect(() => {
     const checkAuth = async () => {
       const expired = isTokenExpired(accessToken)
-      if (expired) {
+      if (expired || !accessToken) {
         console.log('checkAuth: invalid')
         setIsTokenValid(false)
         router.push({
@@ -36,7 +36,7 @@ const LoginRequired = ({ children }: LoginRequiredProps) => {
 
     checkAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [accessToken])
 
   if (isLoading) {
     return <LoadingSpinner loading={isLoading} />

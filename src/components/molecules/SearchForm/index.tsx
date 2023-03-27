@@ -1,8 +1,9 @@
 import { DownOutlined, UpOutlined } from '@ant-design/icons'
-import { Button, Col, Form, Row, Space, theme } from 'antd'
+import { Button, Col, Form, FormInstance, Row, Space, theme } from 'antd'
 import React, { useState } from 'react'
 
 interface SearchFormProps {
+  form: FormInstance
   name: string
   children: React.ReactNode
   expandable?: boolean // 詳細検索のトグル
@@ -11,6 +12,7 @@ interface SearchFormProps {
 }
 
 const SearchForm = ({
+  form,
   name,
   children,
   expandable = false,
@@ -18,7 +20,6 @@ const SearchForm = ({
   onExpandChange,
 }: SearchFormProps) => {
   // const { token } = theme.useToken()
-  const [form] = Form.useForm()
   const [expand, setExpand] = useState(false)
 
   const formStyle = {

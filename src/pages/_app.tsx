@@ -16,12 +16,13 @@ import {
   fadeExit,
   fadeExitActive,
 } from '@/styles/globals'
+import dayjs from '@/utils/dayjs'
 
 import type { AppProps } from 'next/app'
 
 import 'nprogress/nprogress.css'
 
-nProgress.configure({ showSpinner: false })
+nProgress.configure({ showSpinner: false }) // 右上に表示されるスピナーを非表示にする
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -66,7 +67,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <ConfigProvider
           theme={{
             token: {
-              borderRadius: 2,
+              borderRadius: 3,
               colorBorder: '#d0d7de',
               colorBorderSecondary: '#d0d7de',
             },
