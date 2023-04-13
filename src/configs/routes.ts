@@ -7,7 +7,7 @@ const routes = [
   },
   {
     path: '/users/users',
-    title: '顧客マスタ一覧',
+    title: '顧客マスタ',
     parentPath: '/',
     menuCode: 'user-menu',
   },
@@ -25,7 +25,7 @@ const routes = [
   },
   {
     path: '/system/staffs',
-    title: '担当者マスタ一覧',
+    title: '担当者マスタ',
     parentPath: '/system/staffs',
     menuCode: 'system-menu',
   },
@@ -44,7 +44,7 @@ const routes = [
 
   {
     path: '/system/holidays',
-    title: '祝日マスタ一覧',
+    title: '祝日マスタ',
     parentPath: '/',
     menuCode: 'system-menu',
   },
@@ -63,7 +63,7 @@ const routes = [
 
   {
     path: '/system/roles',
-    title: 'ロール一覧',
+    title: 'ロール',
     parentPath: '/',
     menuCode: 'system-menu',
   },
@@ -81,7 +81,7 @@ const routes = [
   },
   {
     path: '/system/codes',
-    title: 'コードマスタ一覧',
+    title: 'コードマスタ',
     parentPath: '/',
     menuCode: 'system-menu',
   },

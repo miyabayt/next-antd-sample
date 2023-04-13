@@ -1,6 +1,6 @@
-import { table } from 'console'
-
-import { Card, Col, Form, Input, Row, Space, Table } from 'antd'
+import { DownloadOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
+import { Button, Card, Col, Form, Input, Row, Space, Table } from 'antd'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import LoginRequired from '@/components/atoms/LoginRequired'
@@ -18,23 +18,8 @@ interface TableParams {
   sortOrder?: string
 }
 
-const columns: ColumnsType<Staff> = [
-  {
-    title: '氏名',
-    dataIndex: 'fullName',
-    render: (_text, record) => `${record.firstName} ${record.lastName}`,
-  },
-  {
-    title: 'メールアドレス',
-    dataIndex: 'email',
-  },
-  {
-    title: '電話番号',
-    dataIndex: 'tel',
-  },
-]
-
-const SearchStaffPage = () => {
+const StaffSearchPage = () => {
+  const router = useRouter()
   const [query, setQuery] = useState({})
   const [expand, setExpand] = useState(false)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
@@ -86,40 +71,100 @@ const SearchStaffPage = () => {
     })
   }
 
+  const columns: ColumnsType<Staff> = [
+    {
+      title: '氏名',
+      dataIndex: 'fullName',
+      render: (_text, record) => `${record.firstName} ${record.lastName}`,
+    },
+    {
+      title: 'メールアドレス',
+      dataIndex: 'email',
+    },
+    {
+      title: '電話番号',
+      dataIndex: 'tel',
+    },
+    {
+      title: 'アクション',
+      render: (_, record) => (
+        <Space size='middle'>
+          <Button
+            type='text'
+            icon={<EditOutlined />}
+            onClick={() => {
+              router.push(`/system/staffs/edit/${record.id}`)
+            }}
+          />
+        </Space>
+      ),
+      align: 'center',
+      width: 100,
+    },
+  ]
+
   return (
     <LoginRequired>
       <DefaultLayout>
-        <Card bordered={false}>
-          <Space direction='vertical' size='middle' style={{ display: 'flex' }}>
-            <SearchForm
-              form={form}
-              name='staffSearchForm'
-              expandable
-              onExpandChange={onExpandChange}
-              onFinish={handleSearch}
+        <Card
+          title='担当者マスタ検索'
+          extra={
+            <Button
+              type='primary'
+              icon={<PlusOutlined />}
+              style={{ minWidth: 100 }}
+              onClick={() => {
+                router.push('/system/staffs/new')
+              }}
+              ghost
             >
+              新規登録
+            </Button>
+          }
+          bordered={true}
+        >
+          <SearchForm
+            form={form}
+            name='staffSearchForm'
+            expandable
+            onExpandChange={onExpandChange}
+            onFinish={handleSearch}
+          >
+            <Row gutter={24}>
+              <Col span={8}>
+                <Form.Item name='fullName' label='氏名'>
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item name='email' label='メールアドレス'>
+                  <Input />
+                </Form.Item>
+              </Col>
+            </Row>
+            {expand && (
               <Row gutter={24}>
                 <Col span={8}>
-                  <Form.Item name='fullName' label='氏名'>
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item name='email' label='メールアドレス'>
+                  <Form.Item name='tel' label='電話番号'>
                     <Input />
                   </Form.Item>
                 </Col>
               </Row>
-              {expand && (
-                <Row gutter={24}>
-                  <Col span={8}>
-                    <Form.Item name='tel' label='電話番号'>
-                      <Input />
-                    </Form.Item>
-                  </Col>
-                </Row>
-              )}
-            </SearchForm>
+            )}
+          </SearchForm>
+          <Space direction='vertical' size='middle' style={{ display: 'flex' }}>
+            <Row align='middle' justify='end'>
+              <Col>
+                <Button
+                  type='primary'
+                  icon={<DownloadOutlined />}
+                  style={{ minWidth: 80, backgroundColor: 'blue-1' }}
+                  disabled={!data?.count}
+                >
+                  CSVダウンロード
+                </Button>
+              </Col>
+            </Row>
             <Table
               rowKey='id'
               bordered
@@ -147,4 +192,4 @@ const SearchStaffPage = () => {
   )
 }
 
-export default SearchStaffPage
+export default StaffSearchPage

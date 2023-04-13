@@ -1,7 +1,26 @@
-import { Card, Col, DatePicker, Form, Input, Row, Space, Table } from 'antd'
+import {
+  DownloadOutlined,
+  EditOutlined,
+  PlusCircleOutlined,
+  PlusOutlined,
+} from '@ant-design/icons'
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  Row,
+  Space,
+  Table,
+} from 'antd'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { AiOutlinePlusCircle } from 'react-icons/ai'
 
 import LoginRequired from '@/components/atoms/LoginRequired'
+import AppContentHeader from '@/components/molecules/AppContentHeader'
 import SearchForm from '@/components/molecules/SearchForm'
 import DefaultLayout from '@/components/templates/DefaultLayout'
 import useHolidayResource from '@/services/holidays/useHolidayResource'
@@ -16,18 +35,8 @@ interface TableParams {
   sortOrder?: string
 }
 
-const columns: ColumnsType<Holiday> = [
-  {
-    title: '名称',
-    dataIndex: 'holidayName',
-  },
-  {
-    title: '日付',
-    dataIndex: 'holidayDate',
-  },
-]
-
-const SearchHolidayPage = () => {
+const HolidaySearchPage = () => {
+  const router = useRouter()
   const [query, setQuery] = useState({})
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
   const [tableParams, setTableParams] = useState<TableParams>({
@@ -74,29 +83,84 @@ const SearchHolidayPage = () => {
     })
   }
 
+  const columns: ColumnsType<Holiday> = [
+    {
+      title: '名称',
+      dataIndex: 'holidayName',
+    },
+    {
+      title: '日付',
+      dataIndex: 'holidayDate',
+    },
+    {
+      title: 'アクション',
+      render: (_, record) => (
+        <Space size='middle'>
+          <Button
+            type='text'
+            icon={<EditOutlined />}
+            onClick={() => {
+              router.push(`/system/holidays/edit/${record.id}`)
+            }}
+          />
+        </Space>
+      ),
+      align: 'center',
+      width: 100,
+    },
+  ]
+
   return (
     <LoginRequired>
       <DefaultLayout>
-        <Card bordered={false}>
-          <Space direction='vertical' size='middle' style={{ display: 'flex' }}>
-            <SearchForm
-              form={form}
-              name='holidaySearchForm'
-              onFinish={handleSearch}
+        <Card
+          title='祝日マスタ検索'
+          extra={
+            <Button
+              type='primary'
+              icon={<PlusOutlined />}
+              style={{ minWidth: 100 }}
+              onClick={() => {
+                router.push('/system/holidays/new')
+              }}
+              ghost
             >
-              <Row gutter={24}>
-                <Col span={8}>
-                  <Form.Item name='holidayName' label='名称'>
-                    <Input />
-                  </Form.Item>
-                </Col>
-                <Col span={8}>
-                  <Form.Item name='holidayDate' label='日付'>
-                    <DatePicker />
-                  </Form.Item>
-                </Col>
-              </Row>
-            </SearchForm>
+              新規登録
+            </Button>
+          }
+          bordered={true}
+        >
+          <SearchForm
+            form={form}
+            name='holidaySearchForm'
+            onFinish={handleSearch}
+          >
+            <Row gutter={24}>
+              <Col span={8}>
+                <Form.Item name='holidayName' label='名称'>
+                  <Input />
+                </Form.Item>
+              </Col>
+              <Col span={8}>
+                <Form.Item name='holidayDate' label='日付'>
+                  <DatePicker />
+                </Form.Item>
+              </Col>
+            </Row>
+          </SearchForm>
+          <Space direction='vertical' size='middle' style={{ display: 'flex' }}>
+            <Row align='middle' justify='end'>
+              <Col>
+                <Button
+                  type='primary'
+                  icon={<DownloadOutlined />}
+                  style={{ minWidth: 80, backgroundColor: 'blue-1' }}
+                  disabled={!data?.count}
+                >
+                  CSVダウンロード
+                </Button>
+              </Col>
+            </Row>
             <Table
               rowKey='id'
               bordered
@@ -124,4 +188,4 @@ const SearchHolidayPage = () => {
   )
 }
 
-export default SearchHolidayPage
+export default HolidaySearchPage
