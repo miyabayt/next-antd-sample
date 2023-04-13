@@ -20,7 +20,6 @@ import { useState } from 'react'
 import { AiOutlinePlusCircle } from 'react-icons/ai'
 
 import LoginRequired from '@/components/atoms/LoginRequired'
-import AppContentHeader from '@/components/molecules/AppContentHeader'
 import SearchForm from '@/components/molecules/SearchForm'
 import DefaultLayout from '@/components/templates/DefaultLayout'
 import useHolidayResource from '@/services/holidays/useHolidayResource'
