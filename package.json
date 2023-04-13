@@ -23,6 +23,7 @@
     "src/**/*.{ts,tsx}": "npm run format"
   },
   "dependencies": {
+    "@ant-design/icons": "^5.0.1",
     "@emotion/css": "^11.10.6",
     "@emotion/react": "^11.10.6",
     "@emotion/server": "^11.10.0",
