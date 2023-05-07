@@ -13,7 +13,7 @@ const LoginRequired = ({ children }: LoginRequiredProps) => {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isTokenValid, setIsTokenValid] = useState(false)
-  const { accessToken, setAccessToken } = useAuthStore((state) => state)
+  const { accessToken, setRedirectTo } = useAuthStore((state) => state)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -23,12 +23,8 @@ const LoginRequired = ({ children }: LoginRequiredProps) => {
         if (expired || !accessToken) {
           console.log('checkAuth: invalid')
           setIsTokenValid(false)
-          router.push({
-            pathname: '/login',
-            query: {
-              redirect_to: router.pathname,
-            },
-          })
+          setRedirectTo(router)
+          router.push('/login')
         } else {
           console.log('checkAuth: valid')
           setIsTokenValid(true)
@@ -42,13 +38,12 @@ const LoginRequired = ({ children }: LoginRequiredProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [accessToken])
 
-  if (!accessToken) {
+  if (!accessToken || !isTokenValid) {
     console.log('loading...')
     return <LoadingSpinner loading={isLoading} />
   }
 
   return <>{children}</>
-  //return <>{isTokenValid ? <>{children}</> : null}</>
 }
 
 export default LoginRequired

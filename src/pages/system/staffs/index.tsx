@@ -1,16 +1,19 @@
 import { DownloadOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Card, Col, Form, Input, Row, Space, Table } from 'antd'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import LoginRequired from '@/components/atoms/LoginRequired'
 import SearchForm from '@/components/molecules/SearchForm'
 import DefaultLayout from '@/components/templates/DefaultLayout'
-import useStaffResource from '@/services/staffs/useStaffResource'
+import exportStaffCsv from '@/services/staffs/exportStaffCsv'
+import useStaffSearch from '@/services/staffs/useStaffSearch'
+import usePagination from '@/services/usePagination'
 import { Staff } from '@/types'
 
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
-import type { FilterValue, SorterResult } from 'antd/es/table/interface'
+import type { SorterResult } from 'antd/es/table/interface'
 
 interface TableParams {
   pagination?: TablePaginationConfig
@@ -21,19 +24,17 @@ interface TableParams {
 const StaffSearchPage = () => {
   const router = useRouter()
   const [query, setQuery] = useState({})
-  const [expand, setExpand] = useState(false)
+  const [expanded, setExpanded] = useState(false)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const { current, setCurrent, pageSize, setPageSize } = usePagination('staffs')
   const [tableParams, setTableParams] = useState<TableParams>({
-    pagination: {
-      current: 1,
-      pageSize: 20,
-    },
+    pagination: { current, pageSize },
   })
-  const { isLoading, data } = useStaffResource(query)
+  const { isLoading, data } = useStaffSearch(query)
   const [form] = Form.useForm()
 
-  const onExpandChange = (expand: boolean) => {
-    setExpand(!expand)
+  const onExpandChange = (expanded: boolean) => {
+    setExpanded(!expanded)
   }
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -46,7 +47,10 @@ const StaffSearchPage = () => {
   }
 
   const handleSearch = (values: FormData) => {
-    const pagination = { current: 1 } // 1ページ目に戻す
+    const pagination = {
+      current: parseInt(router.query.page as string, 1),
+      pageSize: parseInt(router.query.perpage as string, 20),
+    }
 
     setTableParams({
       ...tableParams,
@@ -54,6 +58,7 @@ const StaffSearchPage = () => {
     })
 
     setQuery({ ...values, ...pagination })
+    setCurrent(pagination.current)
   }
 
   const handleTableChange = (
@@ -69,9 +74,27 @@ const StaffSearchPage = () => {
       ...query,
       ...pagination,
     })
+
+    setCurrent(pagination.current)
+    setPageSize(pagination.pageSize)
+
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        page: pagination.current || 1,
+        perpage: pagination.pageSize || 20,
+      },
+    })
   }
 
   const columns: ColumnsType<Staff> = [
+    {
+      title: 'ID',
+      render: (_, record) => (
+        <Link href={`/system/staffs/show/${record.id}`}>{record.id}</Link>
+      ),
+    },
     {
       title: '氏名',
       dataIndex: 'fullName',
@@ -90,7 +113,7 @@ const StaffSearchPage = () => {
       render: (_, record) => (
         <Space size='middle'>
           <Button
-            type='text'
+            type='link'
             icon={<EditOutlined />}
             onClick={() => {
               router.push(`/system/staffs/edit/${record.id}`)
@@ -102,6 +125,10 @@ const StaffSearchPage = () => {
       width: 100,
     },
   ]
+
+  const handleCsvExport = () => {
+    exportStaffCsv(query)
+  }
 
   return (
     <LoginRequired>
@@ -121,7 +148,7 @@ const StaffSearchPage = () => {
               新規登録
             </Button>
           }
-          bordered={true}
+          bordered
         >
           <SearchForm
             form={form}
@@ -142,7 +169,7 @@ const StaffSearchPage = () => {
                 </Form.Item>
               </Col>
             </Row>
-            {expand && (
+            {expanded && (
               <Row gutter={24}>
                 <Col span={8}>
                   <Form.Item name='tel' label='電話番号'>
@@ -158,8 +185,9 @@ const StaffSearchPage = () => {
                 <Button
                   type='primary'
                   icon={<DownloadOutlined />}
-                  style={{ minWidth: 80, backgroundColor: 'blue-1' }}
+                  style={{ minWidth: 100 }}
                   disabled={!data?.count}
+                  onClick={handleCsvExport}
                 >
                   CSVダウンロード
                 </Button>
@@ -177,7 +205,7 @@ const StaffSearchPage = () => {
                 current: tableParams.pagination?.current,
                 pageSize: tableParams.pagination?.pageSize,
                 showTotal: (total, range) =>
-                  `${total}件中、${range[0]}〜${range[1]}を表示`,
+                  `${total}件中、${range[0]}〜${range[1]}件を表示`,
                 showSizeChanger: true,
                 defaultPageSize: 20,
                 pageSizeOptions: ['20', '50', '100'],

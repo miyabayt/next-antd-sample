@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Cookie from 'js-cookie'
 
 import useAuthStore from '@/stores/useAuthStore'
 
@@ -17,12 +18,13 @@ const login = async (
     .request({
       url: '/api/auth/login',
       method: 'POST',
-      data: JSON.stringify({ username, password }),
+      data: { username, password },
     })
     .then(({ data }) => {
       const { accessToken, refreshToken } = data?.data as AccessToken
       setAccessToken(accessToken)
       setRefreshToken(refreshToken)
+      Cookie.set('access_token', accessToken)
       console.log('accessToken: ' + accessToken)
       return data
     })
