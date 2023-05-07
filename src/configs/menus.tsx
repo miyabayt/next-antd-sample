@@ -1,9 +1,17 @@
 import Link from 'next/link'
+import { ReactElement } from 'react'
 import { AiOutlineSetting, AiOutlineUser, AiOutlineHome } from 'react-icons/ai'
 
 import type { MenuProps } from 'antd'
 
-const menus: MenuProps['items'] = [
+export type MenuItem = {
+  key: string
+  label: ReactElement | string
+  icon?: ReactElement
+  children?: MenuItem[]
+}
+
+const menus: MenuItem[] = [
   {
     key: '/',
     label: <Link href='/'>トップ</Link>,
@@ -15,8 +23,8 @@ const menus: MenuProps['items'] = [
     icon: <AiOutlineUser />,
     children: [
       {
-        key: '/users/users',
-        label: <Link href='/users/users'>顧客マスタ</Link>,
+        key: '/user/users',
+        label: <Link href='/user/users'>顧客マスタ</Link>,
       },
     ],
   },

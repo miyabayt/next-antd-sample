@@ -1,9 +1,4 @@
-import {
-  DownloadOutlined,
-  EditOutlined,
-  PlusCircleOutlined,
-  PlusOutlined,
-} from '@ant-design/icons'
+import { DownloadOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import {
   Button,
   Card,
@@ -15,18 +10,20 @@ import {
   Space,
   Table,
 } from 'antd'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { AiOutlinePlusCircle } from 'react-icons/ai'
 
 import LoginRequired from '@/components/atoms/LoginRequired'
 import SearchForm from '@/components/molecules/SearchForm'
 import DefaultLayout from '@/components/templates/DefaultLayout'
-import useHolidayResource from '@/services/holidays/useHolidayResource'
+import exportHolidayCsv from '@/services/holidays/exportHolidayCsv'
+import useHolidaySearch from '@/services/holidays/useHolidaySearch'
+import usePagination from '@/services/usePagination'
 import { Holiday } from '@/types/holiday'
 
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
-import type { FilterValue, SorterResult } from 'antd/es/table/interface'
+import type { SorterResult } from 'antd/es/table/interface'
 
 interface TableParams {
   pagination?: TablePaginationConfig
@@ -38,13 +35,12 @@ const HolidaySearchPage = () => {
   const router = useRouter()
   const [query, setQuery] = useState({})
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
+  const { current, setCurrent, pageSize, setPageSize } =
+    usePagination('holidays')
   const [tableParams, setTableParams] = useState<TableParams>({
-    pagination: {
-      current: 1,
-      pageSize: 20,
-    },
+    pagination: { current, pageSize },
   })
-  const { isLoading, data } = useHolidayResource(query)
+  const { isLoading, data } = useHolidaySearch(query)
   const [form] = Form.useForm()
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -65,6 +61,7 @@ const HolidaySearchPage = () => {
     })
 
     setQuery({ ...values, ...pagination })
+    setCurrent(pagination.current)
   }
 
   const handleTableChange = (
@@ -80,9 +77,27 @@ const HolidaySearchPage = () => {
       ...query,
       ...pagination,
     })
+
+    setCurrent(pagination.current)
+    setPageSize(pagination.pageSize)
+
+    router.push({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        page: pagination.current,
+        perpage: pagination.pageSize,
+      },
+    })
   }
 
   const columns: ColumnsType<Holiday> = [
+    {
+      title: 'ID',
+      render: (_, record) => (
+        <Link href={`/system/holidays/show/${record.id}`}>{record.id}</Link>
+      ),
+    },
     {
       title: '名称',
       dataIndex: 'holidayName',
@@ -96,7 +111,7 @@ const HolidaySearchPage = () => {
       render: (_, record) => (
         <Space size='middle'>
           <Button
-            type='text'
+            type='link'
             icon={<EditOutlined />}
             onClick={() => {
               router.push(`/system/holidays/edit/${record.id}`)
@@ -108,6 +123,10 @@ const HolidaySearchPage = () => {
       width: 100,
     },
   ]
+
+  const handleCsvExport = () => {
+    exportHolidayCsv(query)
+  }
 
   return (
     <LoginRequired>
@@ -127,7 +146,7 @@ const HolidaySearchPage = () => {
               新規登録
             </Button>
           }
-          bordered={true}
+          bordered
         >
           <SearchForm
             form={form}
@@ -142,7 +161,7 @@ const HolidaySearchPage = () => {
               </Col>
               <Col span={8}>
                 <Form.Item name='holidayDate' label='日付'>
-                  <DatePicker />
+                  <DatePicker style={{ minWidth: 180 }} />
                 </Form.Item>
               </Col>
             </Row>
@@ -153,8 +172,9 @@ const HolidaySearchPage = () => {
                 <Button
                   type='primary'
                   icon={<DownloadOutlined />}
-                  style={{ minWidth: 80, backgroundColor: 'blue-1' }}
+                  style={{ minWidth: 100 }}
                   disabled={!data?.count}
+                  onClick={handleCsvExport}
                 >
                   CSVダウンロード
                 </Button>
@@ -172,7 +192,7 @@ const HolidaySearchPage = () => {
                 current: tableParams.pagination?.current,
                 pageSize: tableParams.pagination?.pageSize,
                 showTotal: (total, range) =>
-                  `${total}件中、${range[0]}〜${range[1]}を表示`,
+                  `${total}件中、${range[0]}〜${range[1]}件を表示`,
                 showSizeChanger: true,
                 defaultPageSize: 20,
                 pageSizeOptions: ['20', '50', '100'],

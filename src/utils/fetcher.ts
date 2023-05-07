@@ -1,11 +1,12 @@
-import { AxiosRequestConfig, AxiosResponse } from 'axios'
+import { AxiosRequestConfig } from 'axios'
 
 import axiosInstance from '@/utils/axios'
 
 const fetcher = async (
   url: string,
   config?: AxiosRequestConfig,
-): Promise<AxiosResponse> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<any> => {
   return axiosInstance.request({ ...config, url })
 }
 

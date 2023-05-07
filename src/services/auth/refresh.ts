@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Cookie from 'js-cookie'
 
 import useAuthStore from '@/stores/useAuthStore'
 
@@ -17,7 +18,7 @@ const refresh = async (
     .request({
       url: '/api/auth/refresh',
       method: 'POST',
-      data: JSON.stringify({ accessToken, refreshToken }),
+      data: { accessToken, refreshToken },
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -26,6 +27,7 @@ const refresh = async (
       const { accessToken, refreshToken } = data?.data as AccessToken
       setAccessToken(accessToken)
       setRefreshToken(refreshToken)
+      Cookie.set('access_token', accessToken)
       return data
     })
     .catch((e) => {

@@ -15,7 +15,9 @@ interface LoginForm {
 const LoginPage = () => {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const { setLoginUser } = useAuthStore((state) => state)
+  const { redirectTo, setLoginUser, setRedirectTo } = useAuthStore(
+    (state) => state,
+  )
   const [form] = Form.useForm<LoginForm>()
 
   const handleSubmit = async (values: LoginForm) => {
@@ -26,14 +28,25 @@ const LoginPage = () => {
 
       if (success) {
         setLoginUser(loginUser)
-        const originalPath = router.query['redirect_to'] as string
-        const redirectTo = originalPath ?? '/'
-        console.log('redirect to: ', redirectTo)
-        await router.push(redirectTo)
+
+        if (redirectTo) {
+          const url = redirectTo ? redirectTo.pathname : '/'
+          const asPath = redirectTo ? redirectTo.asPath : '/'
+
+          if (url === asPath) {
+            await router.push('/')
+          } else {
+            console.log('redirect to: ', url, asPath)
+            await router.push(url, asPath)
+          }
+        } else {
+          await router.push('/')
+        }
       }
 
       // TODO toast?
     } finally {
+      setRedirectTo(null)
       setIsLoading(false)
     }
   }

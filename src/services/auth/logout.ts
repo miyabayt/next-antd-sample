@@ -20,7 +20,7 @@ const logout = async (
     .request({
       url: '/api/auth/logout',
       method: 'POST',
-      data: JSON.stringify({ accessToken, refreshToken }),
+      data: { accessToken, refreshToken },
     })
     .then((response) => {
       return clearAuth(response)

@@ -20,7 +20,7 @@ const SearchForm = ({
   onExpandChange,
 }: SearchFormProps) => {
   // const { token } = theme.useToken()
-  const [expand, setExpand] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   const formStyle = {
     padding: '16px 0',
@@ -53,11 +53,11 @@ const SearchForm = ({
               <a
                 style={{ fontSize: 12 }}
                 onClick={() => {
-                  setExpand(!expand)
-                  if (onExpandChange) onExpandChange(expand)
+                  setExpanded(!expanded)
+                  if (onExpandChange) onExpandChange(expanded)
                 }}
               >
-                {expand ? <UpOutlined /> : <DownOutlined />} 詳細検索
+                {expanded ? <UpOutlined /> : <DownOutlined />} 詳細検索
               </a>
             )}
           </Space>

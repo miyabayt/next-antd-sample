@@ -12,6 +12,19 @@ export const globalStyles = css`
   .ant-table-thead .ant-table-cell {
     background-color: #f5f5f5 !important;
   }
+
+  .ant-card-head {
+    min-height: 52px !important;
+    padding: 10px 24px !important;
+  }
+
+  .ant-card-head-title {
+    font-size: 14px;
+  }
+
+  .ant-descriptions-title {
+    font-size: 14px !important;
+  }
 `
 
 export const fadeEnter = css`

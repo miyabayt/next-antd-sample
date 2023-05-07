@@ -1,3 +1,50 @@
-import StaffNewPage from '../new'
+import { App, Card, Form } from 'antd'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
 
-export default StaffNewPage
+import LoginRequired from '@/components/atoms/LoginRequired'
+import StaffForm from '@/components/organisms/StaffForm'
+import DefaultLayout from '@/components/templates/DefaultLayout'
+import updateStaff from '@/services/staffs/updateStaff'
+import useStaff from '@/services/staffs/useStaff'
+import { Staff } from '@/types/staff'
+
+const StaffEditPage = () => {
+  const router = useRouter()
+  const [form] = Form.useForm()
+  const [isSaving, setIsSaving] = useState(false)
+  const { isLoading, data: staff } = useStaff(router.query.id as string)
+  const { message } = App.useApp()
+
+  if (!isLoading && staff) {
+    form.setFieldsValue({ ...staff })
+  }
+
+  const handleSubmit = async (values: Staff) => {
+    try {
+      setIsSaving(true)
+      const updated = await updateStaff({ staff: { ...staff, ...values } })
+      router.push(`/system/staffs/show/${updated.id}`)
+      message.success('データ更新が成功しました。')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  return (
+    <LoginRequired>
+      <DefaultLayout>
+        <Card title='担当者マスタ編集' loading={isLoading} bordered>
+          <StaffForm
+            form={form}
+            onSave={handleSubmit}
+            buttonText='保存'
+            loading={isSaving}
+          />
+        </Card>
+      </DefaultLayout>
+    </LoginRequired>
+  )
+}
+
+export default StaffEditPage

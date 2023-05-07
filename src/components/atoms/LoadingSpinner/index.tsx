@@ -2,7 +2,7 @@ import { css, keyframes } from '@emotion/react'
 import { Spin } from 'antd'
 import { AiOutlineLoading } from 'react-icons/ai'
 
-type LoadingSpinnerProps = {
+interface LoadingSpinnerProps {
   loading: boolean
 }
 

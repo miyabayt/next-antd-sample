@@ -4,8 +4,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import AppLogo from '@/components/molecules/AppLogo'
-import getMenus from '@/services/menus/getMenus'
-import getRoutes from '@/services/routes/getRoutes'
+import { MenuItem } from '@/configs/menus'
+import getMenus from '@/services/getMenus'
+import getRoutes from '@/services/getRoutes'
 import useSettingsStore from '@/stores/useSettingsStore'
 
 import type { MenuProps } from 'antd'
@@ -14,7 +15,7 @@ const { Sider } = Layout
 
 const AppSidebar = () => {
   const router = useRouter()
-  const [sidebarItems, setSidebarItems] = useState<MenuProps['items']>([])
+  const [sidebarItems, setSidebarItems] = useState<MenuItem[]>([])
   const {
     collapsed,
     openKeys,
@@ -22,6 +23,18 @@ const AppSidebar = () => {
     setOpenKeys,
     setActiveMenuKeys,
   } = useSettingsStore((state) => state)
+
+  const isSubMenuKey = (menus: MenuItem[], targetKey: string): boolean => {
+    return menus.some((m) => {
+      if (m.key === targetKey) {
+        return true
+      }
+      if (m.children) {
+        return isSubMenuKey(m.children, targetKey)
+      }
+      return false
+    })
+  }
 
   useEffect(() => {
     const menus = getMenus()
@@ -31,7 +44,12 @@ const AppSidebar = () => {
     const route = routes.find((r) => r.path === router.pathname)
     if (route) {
       setOpenKeys([route.menuCode])
-      setActiveMenuKeys([route.path])
+
+      if (isSubMenuKey(menus, route.path)) {
+        setActiveMenuKeys([route.path])
+      } else {
+        setActiveMenuKeys([route.parentPath])
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.pathname])

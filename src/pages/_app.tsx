@@ -14,6 +14,7 @@ import {
   CSSTransition,
 } from 'react-transition-group' // TODO
 
+import { antdTheme } from '@/configs/theme'
 import {
   fadeEnter,
   fadeEnterActive,
@@ -68,16 +69,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
       </Head>
       <CacheProvider value={cache}>
-        <ConfigProvider
-          theme={{
-            token: {
-              borderRadius: 3,
-              colorBorder: '#d0d7de',
-              colorBorderSecondary: '#d0d7de',
-            },
-          }}
-          locale={jaJP}
-        >
+        <ConfigProvider theme={antdTheme} locale={jaJP}>
           {/* <TransitionGroup>
             <CSSTransition
               key={router.pathname}

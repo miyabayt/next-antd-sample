@@ -1,23 +1,31 @@
 import { AxiosRequestConfig } from 'axios'
 
+import dayjs from '@/utils/dayjs' // タイムゾーン設定済み
 import fetcher from '@/utils/fetcher'
 import useApiResource from '@/utils/useApiResource'
 
-interface SearchStaffParams {
-  fullName?: string
+interface SearchHolidayParams {
+  holidayName?: string
+  holidayDate?: Date | string
   current?: number
   pageSize?: number
 }
 
-const useStaffResource = (params?: SearchStaffParams) => {
+const useHolidaySearch = (params?: SearchHolidayParams) => {
   const query = { ...params }
+  if (params?.holidayDate) {
+    query.holidayDate = dayjs(params.holidayDate)
+      .tz()
+      .format('YYYY-MM-DDTHH:mm:ss') // UTC→ローカル時間
+  }
+
   return useApiResource(
-    ['staffs', query],
+    ['holidays', query],
     async (config?: AxiosRequestConfig) => {
       const page = (query.current || 1) - 1
       const pageSize = query.pageSize || 20
       return fetcher(
-        `/api/system/staffs/search?page=${page}&size=${pageSize}`,
+        `/api/system/holidays/search?page=${page}&size=${pageSize}`,
         {
           ...config,
           method: 'POST',
@@ -28,4 +36,4 @@ const useStaffResource = (params?: SearchStaffParams) => {
   )
 }
 
-export default useStaffResource
+export default useHolidaySearch
