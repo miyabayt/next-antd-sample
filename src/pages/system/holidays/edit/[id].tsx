@@ -17,7 +17,7 @@ const HolidayEditPage = () => {
   const { isLoading, data: holiday } = useHoliday(router.query.id as string)
   const { message } = App.useApp()
 
-  if (!isLoading && holiday) {
+  if (!isLoading && !isSaving && holiday) {
     form.setFieldsValue({ ...holiday, holidayDate: dayjs(holiday.holidayDate) })
   }
 

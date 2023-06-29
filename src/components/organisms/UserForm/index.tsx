@@ -98,7 +98,12 @@ const UserForm = ({ form, onSave, loading, buttonText }: UserFormProps) => {
           <Button
             type='primary'
             style={{ minWidth: 100 }}
-            onClick={() => router.push('/user/users')}
+            onClick={() =>
+              router.push({
+                pathname: '/user/users',
+                query: { page: router.query.page },
+              })
+            }
             ghost
           >
             戻る

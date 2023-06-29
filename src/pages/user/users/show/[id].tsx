@@ -16,7 +16,7 @@ const UserDetailPage = () => {
 
   const handleOkClick = async () => {
     await deleteUser(router.query.id as string)
-    router.push('/user/users')
+    router.push({ pathname: '/user/users', query: { page: router.query.page } })
     message.success('データ削除が成功しました。')
     return true
   }
@@ -33,7 +33,12 @@ const UserDetailPage = () => {
               type='primary'
               icon={<EditOutlined />}
               ghost
-              onClick={() => router.push(`/user/users/edit/${router.query.id}`)}
+              onClick={() =>
+                router.push({
+                  pathname: `/user/users/edit/${router.query.id}`,
+                  query: { page: router.query.page },
+                })
+              }
             >
               編集
             </Button>
@@ -80,7 +85,12 @@ const UserDetailPage = () => {
                   <Button
                     type='primary'
                     style={{ minWidth: 100 }}
-                    onClick={() => router.push('/user/users')}
+                    onClick={() =>
+                      router.push({
+                        pathname: '/user/users',
+                        query: { page: router.query.page },
+                      })
+                    }
                     ghost
                   >
                     戻る

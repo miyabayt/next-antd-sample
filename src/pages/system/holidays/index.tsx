@@ -35,12 +35,14 @@ const HolidaySearchPage = () => {
   const router = useRouter()
   const [query, setQuery] = useState({})
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const { current, setCurrent, pageSize, setPageSize } =
-    usePagination('holidays')
+  const { pageSize, setPageSize } = usePagination('holidays')
   const [tableParams, setTableParams] = useState<TableParams>({
-    pagination: { current, pageSize },
+    pagination: { current: Number(router.query.page) || 1, pageSize },
   })
-  const { isLoading, data } = useHolidaySearch(query)
+  const { isLoading, data } = useHolidaySearch({
+    ...query,
+    ...tableParams.pagination,
+  })
   const [form] = Form.useForm()
 
   const onSelectChange = (newSelectedRowKeys: React.Key[]) => {
@@ -60,8 +62,16 @@ const HolidaySearchPage = () => {
       pagination,
     })
 
-    setQuery({ ...values, ...pagination })
-    setCurrent(pagination.current)
+    setQuery({ ...values })
+
+    router.replace({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        page: pagination.current,
+        perpage: pageSize,
+      },
+    })
   }
 
   const handleTableChange = (
@@ -75,10 +85,7 @@ const HolidaySearchPage = () => {
 
     setQuery({
       ...query,
-      ...pagination,
     })
-
-    setCurrent(pagination.current)
     setPageSize(pagination.pageSize)
 
     router.push({
@@ -95,7 +102,14 @@ const HolidaySearchPage = () => {
     {
       title: 'ID',
       render: (_, record) => (
-        <Link href={`/system/holidays/show/${record.id}`}>{record.id}</Link>
+        <Link
+          href={{
+            pathname: `/system/holidays/show/${record.id}`,
+            query: { page: router.query.page },
+          }}
+        >
+          {record.id}
+        </Link>
       ),
     },
     {
@@ -114,7 +128,10 @@ const HolidaySearchPage = () => {
             type='link'
             icon={<EditOutlined />}
             onClick={() => {
-              router.push(`/system/holidays/edit/${record.id}`)
+              router.push({
+                pathname: `/system/holidays/edit/${record.id}`,
+                query: { page: router.query.page },
+              })
             }}
           />
         </Space>
@@ -139,7 +156,10 @@ const HolidaySearchPage = () => {
               icon={<PlusOutlined />}
               style={{ minWidth: 100 }}
               onClick={() => {
-                router.push('/system/holidays/new')
+                router.push({
+                  pathname: '/system/holidays/new',
+                  query: { page: router.query.page },
+                })
               }}
               ghost
             >

@@ -26,11 +26,14 @@ const StaffSearchPage = () => {
   const [query, setQuery] = useState({})
   const [expanded, setExpanded] = useState(false)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const { current, setCurrent, pageSize, setPageSize } = usePagination('staffs')
+  const { pageSize, setPageSize } = usePagination('staffs')
   const [tableParams, setTableParams] = useState<TableParams>({
-    pagination: { current, pageSize },
+    pagination: { current: Number(router.query.page) || 1, pageSize },
   })
-  const { isLoading, data } = useStaffSearch(query)
+  const { isLoading, data } = useStaffSearch({
+    ...query,
+    ...tableParams.pagination,
+  })
   const [form] = Form.useForm()
 
   const onExpandChange = (expanded: boolean) => {
@@ -47,10 +50,7 @@ const StaffSearchPage = () => {
   }
 
   const handleSearch = (values: FormData) => {
-    const pagination = {
-      current: parseInt(router.query.page as string, 1),
-      pageSize: parseInt(router.query.perpage as string, 20),
-    }
+    const pagination = { current: 1 } // 1ページ目に戻す
 
     setTableParams({
       ...tableParams,
@@ -58,7 +58,15 @@ const StaffSearchPage = () => {
     })
 
     setQuery({ ...values, ...pagination })
-    setCurrent(pagination.current)
+
+    router.replace({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        page: pagination.current,
+        perpage: pageSize,
+      },
+    })
   }
 
   const handleTableChange = (
@@ -74,16 +82,14 @@ const StaffSearchPage = () => {
       ...query,
       ...pagination,
     })
-
-    setCurrent(pagination.current)
     setPageSize(pagination.pageSize)
 
     router.push({
       pathname: router.pathname,
       query: {
         ...router.query,
-        page: pagination.current || 1,
-        perpage: pagination.pageSize || 20,
+        page: pagination.current,
+        perpage: pagination.pageSize,
       },
     })
   }
@@ -92,7 +98,14 @@ const StaffSearchPage = () => {
     {
       title: 'ID',
       render: (_, record) => (
-        <Link href={`/system/staffs/show/${record.id}`}>{record.id}</Link>
+        <Link
+          href={{
+            pathname: `/system/staffs/show/${record.id}`,
+            query: { page: router.query.page },
+          }}
+        >
+          {record.id}
+        </Link>
       ),
     },
     {
@@ -116,7 +129,10 @@ const StaffSearchPage = () => {
             type='link'
             icon={<EditOutlined />}
             onClick={() => {
-              router.push(`/system/staffs/edit/${record.id}`)
+              router.push({
+                pathname: `/system/staffs/edit/${record.id}`,
+                query: { page: router.query.page },
+              })
             }}
           />
         </Space>
@@ -141,7 +157,10 @@ const StaffSearchPage = () => {
               icon={<PlusOutlined />}
               style={{ minWidth: 100 }}
               onClick={() => {
-                router.push('/system/staffs/new')
+                router.push({
+                  pathname: '/system/staffs/new',
+                  query: { page: router.query.page },
+                })
               }}
               ghost
             >

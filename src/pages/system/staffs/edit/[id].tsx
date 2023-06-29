@@ -16,7 +16,7 @@ const StaffEditPage = () => {
   const { isLoading, data: staff } = useStaff(router.query.id as string)
   const { message } = App.useApp()
 
-  if (!isLoading && staff) {
+  if (!isLoading && !isSaving && staff) {
     form.setFieldsValue({ ...staff })
   }
 
@@ -24,7 +24,10 @@ const StaffEditPage = () => {
     try {
       setIsSaving(true)
       const updated = await updateStaff({ staff: { ...staff, ...values } })
-      router.push(`/system/staffs/show/${updated.id}`)
+      router.push({
+        pathname: `/system/staffs/show/${updated.id}`,
+        query: { page: router.query.page },
+      })
       message.success('データ更新が成功しました。')
     } finally {
       setIsSaving(false)

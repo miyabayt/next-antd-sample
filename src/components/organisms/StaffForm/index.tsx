@@ -78,7 +78,12 @@ const StaffForm = ({ form, onSave, loading, buttonText }: StaffFormProps) => {
           <Button
             type='primary'
             style={{ minWidth: 100 }}
-            onClick={() => router.push('/system/staffs')}
+            onClick={() =>
+              router.push({
+                pathname: '/system/staffs',
+                query: { page: router.query.page },
+              })
+            }
             ghost
           >
             戻る

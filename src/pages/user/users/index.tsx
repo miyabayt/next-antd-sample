@@ -26,11 +26,14 @@ const UserSearchPage = () => {
   const [query, setQuery] = useState({})
   const [expanded, setExpanded] = useState(false)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const { current, setCurrent, pageSize, setPageSize } = usePagination('users')
+  const { pageSize, setPageSize } = usePagination('users')
   const [tableParams, setTableParams] = useState<TableParams>({
-    pagination: { current, pageSize },
+    pagination: { current: Number(router.query.page) || 1, pageSize },
   })
-  const { isLoading, data } = useUserSearch(query)
+  const { isLoading, data } = useUserSearch({
+    ...query,
+    ...tableParams.pagination,
+  })
   const [form] = Form.useForm()
 
   const onExpandChange = (expanded: boolean) => {
@@ -47,18 +50,23 @@ const UserSearchPage = () => {
   }
 
   const handleSearch = (values: FormData) => {
-    const pagination = {
-      current: parseInt(router.query.page as string, 1),
-      pageSize: parseInt(router.query.perpage as string, 20),
-    }
+    const pagination = { current: 1 } // 1ページ目に戻す
 
     setTableParams({
       ...tableParams,
       pagination,
     })
 
-    setQuery({ ...values, ...pagination })
-    setCurrent(pagination.current)
+    setQuery({ ...values })
+
+    router.replace({
+      pathname: router.pathname,
+      query: {
+        ...router.query,
+        page: pagination.current,
+        perpage: pageSize,
+      },
+    })
   }
 
   const handleTableChange = (
@@ -72,18 +80,15 @@ const UserSearchPage = () => {
 
     setQuery({
       ...query,
-      ...pagination,
     })
-
-    setCurrent(pagination.current)
     setPageSize(pagination.pageSize)
 
     router.push({
       pathname: router.pathname,
       query: {
         ...router.query,
-        page: pagination.current || 1,
-        perpage: pagination.pageSize || 20,
+        page: pagination.current,
+        perpage: pagination.pageSize,
       },
     })
   }
@@ -92,7 +97,14 @@ const UserSearchPage = () => {
     {
       title: 'ID',
       render: (_, record) => (
-        <Link href={`/user/users/show/${record.id}`}>{record.id}</Link>
+        <Link
+          href={{
+            pathname: `/user/users/show/${record.id}`,
+            query: { page: router.query.page },
+          }}
+        >
+          {record.id}
+        </Link>
       ),
     },
     {
@@ -116,7 +128,10 @@ const UserSearchPage = () => {
             type='link'
             icon={<EditOutlined />}
             onClick={() => {
-              router.push(`/user/users/edit/${record.id}`)
+              router.push({
+                pathname: `/user/users/edit/${record.id}`,
+                query: { page: router.query.page },
+              })
             }}
           />
         </Space>
@@ -141,7 +156,10 @@ const UserSearchPage = () => {
               icon={<PlusOutlined />}
               style={{ minWidth: 100 }}
               onClick={() => {
-                router.push('/user/users/new')
+                router.push({
+                  pathname: '/user/users/new',
+                  query: { page: router.query.page },
+                })
               }}
               ghost
             >

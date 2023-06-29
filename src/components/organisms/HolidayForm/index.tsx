@@ -45,7 +45,12 @@ const HolidayForm = ({
           <Button
             type='primary'
             style={{ minWidth: 100 }}
-            onClick={() => router.push('/system/holidays')}
+            onClick={() =>
+              router.push({
+                pathname: '/system/holidays',
+                query: { page: router.query.page },
+              })
+            }
             ghost
           >
             戻る

@@ -17,7 +17,7 @@ const UserEditPage = () => {
   const { isLoading, data: user } = useUser(router.query.id as string)
   const { message } = App.useApp()
 
-  if (!isLoading && user) {
+  if (!isLoading && !isSaving && user) {
     form.setFieldsValue({ ...user, userDate: dayjs(user.userDate) })
   }
 
@@ -25,7 +25,10 @@ const UserEditPage = () => {
     try {
       setIsSaving(true)
       const updated = await updateUser({ user: { ...user, ...values } })
-      router.push(`/user/users/show/${updated.id}`)
+      router.push({
+        pathname: `/user/users/show/${updated.id}`,
+        query: { page: router.query.page },
+      })
       message.success('データ更新が成功しました。')
     } finally {
       setIsSaving(false)

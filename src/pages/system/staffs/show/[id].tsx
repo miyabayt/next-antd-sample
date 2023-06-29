@@ -34,7 +34,10 @@ const StaffDetailPage = () => {
               icon={<EditOutlined />}
               ghost
               onClick={() =>
-                router.push(`/system/staffs/edit/${router.query.id}`)
+                router.push({
+                  pathname: `/system/staffs/edit/${router.query.id}`,
+                  query: { page: router.query.page },
+                })
               }
             >
               編集
@@ -76,7 +79,12 @@ const StaffDetailPage = () => {
                   <Button
                     type='primary'
                     style={{ minWidth: 100 }}
-                    onClick={() => router.push('/system/staffs')}
+                    onClick={() =>
+                      router.push({
+                        pathname: '/system/staffs',
+                        query: { page: router.query.page },
+                      })
+                    }
                     ghost
                   >
                     戻る
