@@ -1,6 +1,6 @@
 import axios from 'axios'
+import Cookie from 'js-cookie'
 
-import useAuthStore from '@/stores/useAuthStore'
 import { LoginUser } from '@/types'
 
 const getLoginUser = async (): Promise<{
@@ -8,8 +8,7 @@ const getLoginUser = async (): Promise<{
   success: boolean
   message: string
 }> => {
-  const { accessToken } = useAuthStore.getState()
-
+  const accessToken = Cookie.get('access_token')
   return axios
     .request({
       url: '/api/auth/me',

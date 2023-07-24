@@ -1,7 +1,7 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios'
+import Cookie from 'js-cookie'
 
 import refresh from '@/services/auth/refresh'
-import useAuthStore from '@/stores/useAuthStore'
 import { isTokenExpired } from '@/utils/jwt'
 
 let isRefreshing = false
@@ -17,8 +17,8 @@ const createAxiosInstance = () => {
   })
 
   instance.interceptors.request.use(async (config) => {
-    const { accessToken, refreshToken } = useAuthStore.getState()
-
+    const accessToken = Cookie.get('access_token')
+    const refreshToken = Cookie.get('refresh_token')
     let newAccessToken = accessToken
     if (
       !isRefreshing &&

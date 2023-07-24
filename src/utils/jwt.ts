@@ -1,6 +1,6 @@
 import { Buffer } from 'buffer'
 
-export const isTokenExpired = (accessToken: string | null): boolean => {
+export const isTokenExpired = (accessToken: string | undefined): boolean => {
   if (!accessToken) {
     return false
   }

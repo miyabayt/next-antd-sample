@@ -1,4 +1,5 @@
 import { AxiosResponse } from 'axios'
+import Cookie from 'js-cookie'
 
 import useAuthStore from '@/stores/useAuthStore'
 import axiosInstance from '@/utils/axios'
@@ -7,11 +8,10 @@ const logout = async (
   accessToken: string | null,
   refreshToken: string | null,
 ): Promise<AxiosResponse> => {
-  const { setAccessToken, setRefreshToken, setLoginUser } =
-    useAuthStore.getState()
+  const { setLoginUser } = useAuthStore.getState()
   const clearAuth = (response: AxiosResponse) => {
-    setAccessToken(null)
-    setRefreshToken(null)
+    Cookie.remove('access_token')
+    Cookie.remove('refrest_token')
     setLoginUser(null)
     return Promise.resolve(response)
   }
