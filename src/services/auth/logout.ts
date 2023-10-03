@@ -5,8 +5,8 @@ import useAuthStore from '@/stores/useAuthStore'
 import axiosInstance from '@/utils/axios'
 
 const logout = async (
-  accessToken: string | null,
-  refreshToken: string | null,
+  accessToken: string | undefined,
+  refreshToken: string | undefined,
 ): Promise<AxiosResponse> => {
   const { setLoginUser } = useAuthStore.getState()
   const clearAuth = (response: AxiosResponse) => {

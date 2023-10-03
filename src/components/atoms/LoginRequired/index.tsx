@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import LoadingSpinner from '@/components/atoms/LoadingSpinner'
+import getLoginUser from '@/services/auth/getLoginUser'
 import useAuthStore from '@/stores/useAuthStore'
 import { isTokenExpired } from '@/utils/jwt'
 
@@ -14,7 +15,9 @@ const LoginRequired = ({ children }: LoginRequiredProps) => {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isTokenValid, setIsTokenValid] = useState(false)
-  const { loginUser, setRedirectTo } = useAuthStore((state) => state)
+  const { loginUser, setLoginUser, setRedirectTo } = useAuthStore(
+    (state) => state,
+  )
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -30,6 +33,12 @@ const LoginRequired = ({ children }: LoginRequiredProps) => {
         } else {
           console.log('checkAuth: valid')
           setIsTokenValid(true)
+          if (!loginUser) {
+            const { data: loginUser, success } = await getLoginUser()
+            if (success) {
+              setLoginUser(loginUser)
+            }
+          }
         }
       } finally {
         setIsLoading(false)

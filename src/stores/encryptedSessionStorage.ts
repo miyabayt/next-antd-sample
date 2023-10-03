@@ -5,7 +5,7 @@ import { SECRET_KEY } from '@/configs/app'
 
 // SessionStorageを難読化する
 const encryptedSessionStorage: StateStorage = {
-  getItem: (name: string): string | null => {
+  getItem: (name: string): string | undefined => {
     const encrypted = sessionStorage.getItem(name)
     if (encrypted) {
       const decrypted = crypto.AES.decrypt(encrypted, SECRET_KEY)

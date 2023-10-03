@@ -12,6 +12,9 @@ const useHoliday = (id: string) => {
         method: 'GET',
       }).then(({ data }) => data?.data)
     },
+    {
+      enabled: !!id,
+    },
   )
 }
 

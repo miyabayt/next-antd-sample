@@ -2,7 +2,7 @@ import { NextRouter } from 'next/router'
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
-import encryptedSessionStorage from './encryptedSessionStorage'
+import encryptedSessionStorage from '@/stores/encryptedSessionStorage'
 
 import type { LoginUser } from '@/types'
 

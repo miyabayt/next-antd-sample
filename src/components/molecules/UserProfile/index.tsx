@@ -1,5 +1,6 @@
 import { css, ClassNames } from '@emotion/react'
 import { Avatar, Button, Col, Dropdown, Menu, Row, Space, Switch } from 'antd'
+import Cookie from 'js-cookie'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { AiOutlineUser } from 'react-icons/ai'
@@ -11,14 +12,14 @@ import type { MenuProps } from 'antd'
 
 const UserProfile = () => {
   const router = useRouter()
-  const { accessToken, refreshToken, loginUser } = useAuthStore(
-    (state) => state,
-  )
+  const { loginUser } = useAuthStore((state) => state)
 
   // TODO
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
   const handleLogout = async () => {
+    const accessToken = Cookie.get('access_token')
+    const refreshToken = Cookie.get('refresh_token')
     const { status } = await logout(accessToken, refreshToken)
 
     if (status < 500) {
