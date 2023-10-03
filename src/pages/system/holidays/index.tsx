@@ -35,13 +35,12 @@ const HolidaySearchPage = () => {
   const router = useRouter()
   const [query, setQuery] = useState({})
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const { pageSize, setPageSize } = usePagination('holidays')
-  const [tableParams, setTableParams] = useState<TableParams>({
-    pagination: { current: Number(router.query.page) || 1, pageSize },
-  })
+  const { pagination, sort, setPagination, setSort } = usePagination(
+    router.pathname,
+  )
   const { isLoading, data } = useHolidaySearch({
     ...query,
-    ...tableParams.pagination,
+    ...pagination,
   })
   const [form] = Form.useForm()
 
@@ -56,45 +55,19 @@ const HolidaySearchPage = () => {
 
   const handleSearch = (values: FormData) => {
     const pagination = { current: 1 } // 1ページ目に戻す
-
-    setTableParams({
-      ...tableParams,
-      pagination,
-    })
-
-    setQuery({ ...values })
-
-    router.replace({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        page: pagination.current,
-        perpage: pageSize,
-      },
-    })
+    setPagination(router.pathname, pagination)
+    setQuery({ ...values, ...pagination })
   }
 
   const handleTableChange = (
     pagination: TablePaginationConfig,
     sorter: SorterResult<Holiday>,
   ) => {
-    setTableParams({
-      pagination,
-      ...sorter,
-    })
-
+    setPagination(router.pathname, pagination)
+    //setSort(router.pathname, {...sorter})
     setQuery({
       ...query,
-    })
-    setPageSize(pagination.pageSize)
-
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        page: pagination.current,
-        perpage: pagination.pageSize,
-      },
+      ...pagination,
     })
   }
 
@@ -102,14 +75,7 @@ const HolidaySearchPage = () => {
     {
       title: 'ID',
       render: (_, record) => (
-        <Link
-          href={{
-            pathname: `/system/holidays/show/${record.id}`,
-            query: { page: router.query.page },
-          }}
-        >
-          {record.id}
-        </Link>
+        <Link href={`/system/holidays/show/${record.id}`}>{record.id}</Link>
       ),
     },
     {
@@ -128,10 +94,7 @@ const HolidaySearchPage = () => {
             type='link'
             icon={<EditOutlined />}
             onClick={() => {
-              router.push({
-                pathname: `/system/holidays/edit/${record.id}`,
-                query: { page: router.query.page },
-              })
+              router.push(`/system/holidays/edit/${record.id}`)
             }}
           />
         </Space>
@@ -156,10 +119,7 @@ const HolidaySearchPage = () => {
               icon={<PlusOutlined />}
               style={{ minWidth: 100 }}
               onClick={() => {
-                router.push({
-                  pathname: '/system/holidays/new',
-                  query: { page: router.query.page },
-                })
+                router.push('/system/holidays/new')
               }}
               ghost
             >
@@ -209,8 +169,8 @@ const HolidaySearchPage = () => {
               columns={columns}
               pagination={{
                 total: data?.count,
-                current: tableParams.pagination?.current,
-                pageSize: tableParams.pagination?.pageSize,
+                current: pagination.current,
+                pageSize: pagination.pageSize,
                 showTotal: (total, range) =>
                   `${total}件中、${range[0]}〜${range[1]}件を表示`,
                 showSizeChanger: true,

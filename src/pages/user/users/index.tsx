@@ -10,29 +10,22 @@ import DefaultLayout from '@/components/templates/DefaultLayout'
 import usePagination from '@/services/usePagination'
 import exportUserCsv from '@/services/users/exportUserCsv'
 import useUserSearch from '@/services/users/useUserSearch'
-import { User } from '@/types/user'
 
+import { User, Pagination } from '@/types'
 import type { ColumnsType, TablePaginationConfig } from 'antd/es/table'
 import type { SorterResult } from 'antd/es/table/interface'
-
-interface TableParams {
-  pagination?: TablePaginationConfig
-  sortField?: string
-  sortOrder?: string
-}
 
 const UserSearchPage = () => {
   const router = useRouter()
   const [query, setQuery] = useState({})
   const [expanded, setExpanded] = useState(false)
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([])
-  const { pageSize, setPageSize } = usePagination('users')
-  const [tableParams, setTableParams] = useState<TableParams>({
-    pagination: { current: Number(router.query.page) || 1, pageSize },
-  })
+  const { pagination, sort, setPagination, setSort } = usePagination(
+    router.pathname,
+  )
   const { isLoading, data } = useUserSearch({
     ...query,
-    ...tableParams.pagination,
+    ...pagination,
   })
   const [form] = Form.useForm()
 
@@ -51,45 +44,18 @@ const UserSearchPage = () => {
 
   const handleSearch = (values: FormData) => {
     const pagination = { current: 1 } // 1ページ目に戻す
-
-    setTableParams({
-      ...tableParams,
-      pagination,
-    })
-
+    setPagination(router.pathname, pagination)
     setQuery({ ...values })
-
-    router.replace({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        page: pagination.current,
-        perpage: pageSize,
-      },
-    })
   }
 
   const handleTableChange = (
-    pagination: TablePaginationConfig,
+    pagination: Pagination,
     sorter: SorterResult<User>,
   ) => {
-    setTableParams({
-      pagination,
-      ...sorter,
-    })
-
+    setPagination(router.pathname, pagination)
+    //setSort(router.pathname, {...sorter})
     setQuery({
       ...query,
-    })
-    setPageSize(pagination.pageSize)
-
-    router.push({
-      pathname: router.pathname,
-      query: {
-        ...router.query,
-        page: pagination.current,
-        perpage: pagination.pageSize,
-      },
     })
   }
 
@@ -97,14 +63,7 @@ const UserSearchPage = () => {
     {
       title: 'ID',
       render: (_, record) => (
-        <Link
-          href={{
-            pathname: `/user/users/show/${record.id}`,
-            query: { page: router.query.page },
-          }}
-        >
-          {record.id}
-        </Link>
+        <Link href={`/user/users/show/${record.id}`}>{record.id}</Link>
       ),
     },
     {
@@ -128,10 +87,7 @@ const UserSearchPage = () => {
             type='link'
             icon={<EditOutlined />}
             onClick={() => {
-              router.push({
-                pathname: `/user/users/edit/${record.id}`,
-                query: { page: router.query.page },
-              })
+              router.push(`/user/users/edit/${record.id}`)
             }}
           />
         </Space>
@@ -156,10 +112,7 @@ const UserSearchPage = () => {
               icon={<PlusOutlined />}
               style={{ minWidth: 100 }}
               onClick={() => {
-                router.push({
-                  pathname: '/user/users/new',
-                  query: { page: router.query.page },
-                })
+                router.push('/user/users/new')
               }}
               ghost
             >
@@ -220,8 +173,8 @@ const UserSearchPage = () => {
               columns={columns}
               pagination={{
                 total: data?.count,
-                current: tableParams.pagination?.current,
-                pageSize: tableParams.pagination?.pageSize,
+                current: pagination.current,
+                pageSize: pagination.pageSize,
                 showTotal: (total, range) =>
                   `${total}件中、${range[0]}〜${range[1]}件を表示`,
                 showSizeChanger: true,
